@@ -45,4 +45,4 @@ def total_collatz(num):
         if num == 1:
             total[total_elements[0]] = len(total_elements)
             return total
-            break
+
