@@ -11,6 +11,10 @@ import operator
 from typing import List
 
 
+class InvalidExpression(Exception):
+    pass
+
+
 def reverse_polish_notation(expression: List[str]) -> int:
     """
     >>> reverse_polish_notation(["2", "1", "+", "3", "*"])
@@ -20,18 +24,31 @@ def reverse_polish_notation(expression: List[str]) -> int:
 
     """
     stack = []
-    operators = {'+': operator.add, '-': operator.sub, '*': operator.mul, '/': operator.floordiv}
+    operators = {'+': operator.add,
+                 '-': operator.sub,
+                 '*': operator.mul,
+                 '/': operator.floordiv
+                 }
     for operator_operand in expression:
         try:
             num = int(operator_operand)
             stack.append(num)
         except ValueError:
             op = operator_operand
-            operand_2 = stack.pop()
-            operand_1 = stack.pop()
+            try:
+                operand_2 = stack.pop()
+            except IndexError:
+                raise InvalidExpression(f'Missing some operands: {expression}')
+            try:
+                operand_1 = stack.pop()
+            except IndexError:
+                raise InvalidExpression(f'Missing some operands: {expression}')
 
             func = operators[op]
             result = func(operand_1, operand_2)
             stack.append(result)
 
+    if len(stack) > 1:
+        raise InvalidExpression(
+            f'There are to much (or missing) some operands/operators in the expression: {expression}')
     return stack.pop()
